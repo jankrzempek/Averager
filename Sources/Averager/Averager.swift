@@ -11,15 +11,27 @@ public struct Averager {
             temporaryHolder += number
             calculator += decider
             
+            if calculator < 1 && number == data.last {
+                let devideBy = Int(calculator / decider)
+                averaged.append(temporaryHolder / Double(devideBy))
+                clearParameters(first: &temporaryHolder, second: &calculator)
+            }
+            
             if calculator >= 1 {
                 averaged.append(temporaryHolder / chunkNumber)
-                temporaryHolder = 0
-                calculator = 0
+                clearParameters(first: &temporaryHolder, second: &calculator)
             }
         }
-        if Int(chunkNumber) > data.count - 1 {
+        if Int(chunkNumber) > data.count {
             assertionFailure("Chunk number > number of elements in array")
         }
         return averaged
+    }
+}
+
+private extension Averager {
+    func clearParameters(first: inout Double, second: inout Double) {
+        first = 0.0
+        second = 0.0
     }
 }
