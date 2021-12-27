@@ -1,37 +1,56 @@
+import Darwin
+
 public struct Averager {
     public init() {}
     
-    public func average(data: Array<Double>, chunkNumber: Double) -> Array<Double> {
-        let decider: Double = 1 / chunkNumber
-        var calculator = 0.0
+    public func arithmeticAverage(using data: Array<Double>, chunkedEvery chunkNumber: Double) -> Array<Double> {
+        assertCorrectness(of: data, chunkedBy: chunkNumber)
         var averaged = [Double]()
-        var temporaryHolder = 0.0
+        let chunkedArray = data.chunked(into: Int(chunkNumber))
         
-        data.forEach { number in
-            temporaryHolder += number
-            calculator += decider
-            
-            if calculator < 1 && number == data.last {
-                let devideBy = Int(calculator / decider)
-                averaged.append(temporaryHolder / Double(devideBy))
-                clearParameters(first: &temporaryHolder, second: &calculator)
-            }
-            
-            if calculator >= 1 {
-                averaged.append(temporaryHolder / chunkNumber)
-                clearParameters(first: &temporaryHolder, second: &calculator)
+        chunkedArray.forEach { chunk in
+            averaged.append(chunk.map({ $0 }).reduce(0, +) / Double(chunk.count))
+        }
+        return averaged
+    }
+    
+    public func medianAverage(using data: Array<Double>, chunkedEvery chunkNumber: Double) -> Array<Double> {
+        assertCorrectness(of: data, chunkedBy: chunkNumber)
+        var averaged = [Double]()
+        let chunkedArray = data.chunked(into: Int(chunkNumber))
+        
+        chunkedArray.forEach { chunk in
+            let middle = chunk.count / 2
+            if chunk.count % 2 == 0 {
+                var counter = 0.0
+                counter += chunk[middle]
+                counter += chunk[middle - 1]
+                averaged.append(counter / 2)
+            } else {
+                averaged.append(chunk[middle])
             }
         }
-        if Int(chunkNumber) > data.count {
-            assertionFailure("Chunk number > number of elements in array")
+        return averaged
+    }
+    
+    public func geometricAverage(using data: Array<Double>, chunkedEvery chunkNumber: Double) -> Array<Double> {
+        assertCorrectness(of: data, chunkedBy: chunkNumber)
+        var averaged = [Double]()
+        let chunkedArray = data.chunked(into: Int(chunkNumber))
+        
+        chunkedArray.forEach { chunk in
+            let sum = chunk.map({ $0 }).reduce(1, *)
+            let element = pow(sum, 1.0 / Double(chunk.count))
+            averaged.append(element)
         }
         return averaged
     }
 }
 
-private extension Averager {
-    func clearParameters(first: inout Double, second: inout Double) {
-        first = 0.0
-        second = 0.0
+internal extension Averager {
+    func assertCorrectness(of data: Array<Double>, chunkedBy chunkNumber: Double) {
+        if Int(chunkNumber) > data.count {
+            assertionFailure("Chunk number is grater then number of elements in array")
+        }
     }
 }
