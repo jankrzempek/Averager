@@ -13,9 +13,8 @@ Averager methods:
  - Median average
  - Geometric average
 
+Example of arithmetic average:
 ```
-// Example of arithmetic average
-        
 averager.arithmeticAverage(using: [1, 2, 3, 4, 5], chunkedEvery: 2)
 
 // Chunk number == 0
